@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arabice Pronunciation tool</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <h1 style = "margin-top: 25px;">My Arabic Pronunciation Tool</h1>
+  
+  <div class="letter">
+    <p>Khaa</p>
+    <div class="audio">
+      <button id="recordButton" onclick="toggleRecording()">Start Recording</button>
+    </div>
+  </div>
+
+  <div class="letter">
+    <p>haa</p>
+  </div>
+
+  
+
+</body>
+</html>
+<script>
+  
+  let mediaRecorder;
+let audioChunks = [];
+
+function toggleRecording() {
+  let recordButton = document.getElementById('recordButton');
+  if (!mediaRecorder || mediaRecorder.state === "inactive") {
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        mediaRecorder = new MediaRecorder(stream);
+        mediaRecorder.ondataavailable = e => {
+          audioChunks.push(e.data);
+        };
+        mediaRecorder.onstop = () => {
+          const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+          audioChunks = [];
+          saveAudio(audioBlob);
+        };
+        mediaRecorder.start();
+        recordButton.textContent = 'Stop Recording';
+      }).catch(e => {
+        console.error(e);
+        alert('Could not start audio recording: ' + e.message);
+      });
+  } else {
+    mediaRecorder.stop();
+    recordButton.textContent = 'Start Recording';
+  }
+}
+
+function saveAudio(audioBlob) {
+  const audioUrl = URL.createObjectURL(audioBlob);
+  const audio = new Audio(audioUrl);
+  audio.controls = true;
+  document.body.appendChild(audio);
+  sendAudioToBackend(audioBlob);
+}
+
+function sendAudioToBackend(audioBlob) {
+  let formData = new FormData();
+  formData.append('audio', audioBlob, 'audio.wav');
+
+  fetch('http://127.0.0.1:5000/upload-audio', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Network response was not ok ' + response.statusText);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Success:', data);
+    alert(`Pronunciation is: ${data.pronunciation}`);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+    alert('Error processing audio');
+  });
+}
+
+
+</script>
