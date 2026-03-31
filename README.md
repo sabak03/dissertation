@@ -3,8 +3,6 @@
 A deep learning-based prototype designed to provide instant feedback on Arabic pronunciation, with a focus on Tajweed accuracy.
 This project explores how AI can be used to support language learning by analysing user speech and providing real-time corrective feedback.
 
-# Dissertation
-
 ---
 
 ## Project Overview
