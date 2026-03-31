@@ -138,6 +138,6 @@ This project contributes to:
 
 ## Repository
 
-https://github.com/sabak03/dissertation/tree/master
+https://github.com/sabak03/ai-pronunciation-feedback-tool/tree/master
 > Note: Project files are located in the `master` branch of this repository.
 
